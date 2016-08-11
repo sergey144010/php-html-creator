@@ -1,10 +1,10 @@
 <?php
 namespace sergey144010;
 /*
-Вложенные теги
+Р’Р»РѕР¶РµРЅРЅС‹Рµ С‚РµРіРё
 
 ############
-Пример №1:
+РџСЂРёРјРµСЂ в„–1:
 ############
 
 $array = [
@@ -22,7 +22,7 @@ use sergey144010\HtmlCreator as Html;
 
 Html::create($array);
 
-Вернёт следующую строку:
+Р’РµСЂРЅС‘С‚ СЃР»РµРґСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ:
 
 <p class="text" id="paragraph1">
 	Text many many text
@@ -35,7 +35,7 @@ Html::create($array);
 </div>
 
 ############
-Пример №2 - Простая Html страница:
+РџСЂРёРјРµСЂ в„–2 - РџСЂРѕСЃС‚Р°СЏ Html СЃС‚СЂР°РЅРёС†Р°:
 ############
 
 $array = [
@@ -70,7 +70,7 @@ use sergey144010\HtmlCreator as Html;
 
 Html::create($array);
 
-Вернёт следующую строку:
+Р’РµСЂРЅС‘С‚ СЃР»РµРґСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ:
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
 	<head>
@@ -98,7 +98,7 @@ Html::create($array);
 </html>
 
 ############
-Схема:
+РЎС…РµРјР°:
 ############
 
 [
@@ -147,7 +147,7 @@ class HtmlCreator
 		$string=false; $tag=false;
 		$iterateArray=false; $stringIterateArray=false;
 		foreach($array as $key=>$val){
-			/* Первый элемент массива */
+			/* РџРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ РјР°СЃСЃРёРІР° */
 			if($i==0){
 				if(is_int($key)){
 					$tag = $val;
@@ -161,7 +161,7 @@ class HtmlCreator
 				if($i==0 && $count==1){
 					$string .= '>'.$tagVal.'</'.$tag.'>';
 				};
-			/* Последний элемент массива */
+			/* РџРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚ РјР°СЃСЃРёРІР° */
 			}elseif($i == ($count-1)){
 				if(!is_array($val)){
 					$string .= ' '.$key.'="'.$val.'"';
@@ -176,7 +176,7 @@ class HtmlCreator
 					$stringIterateArray = false;
 				};
 				$string .= '>'.$tagVal.$stringIterateArray.'</'.$tag.'>';
-			/* Все остальные элементы массива */
+			/* Р’СЃРµ РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ РјР°СЃСЃРёРІР° */
 			}else{
 				if(!is_array($val)){
 					$string .= ' '.$key.'="'.$val.'"';
