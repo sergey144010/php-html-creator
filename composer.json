@@ -1,0 +1,21 @@
+{
+  "name": "sergey144010/php-html-creator",
+  "type": "library",
+  "description": "Php html creator",
+  "keywords": ["php", "html", "creator"],
+  "homepage": "https://github.com/sergey144010/php-html-creator",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sergey144010",
+      "email": "sergey144010@mail.ru",
+      "homepage": "https://github.com/sergey144010"
+    }
+  ],
+  "require": {
+    "php": ">=5.6"
+  },
+  "autoload": {
+    "psr-4": {"sergey144010\\": "HtmlCreator/"}
+  }
+}
