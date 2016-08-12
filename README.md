@@ -44,6 +44,19 @@ $array = [
 
 Html::create($array);
 
+/*
+Result：
+<p class="text" id="paragraph1">
+	Text many many text
+	<div class="text2" id="paragraph2">
+		<span class="text3" id="paragraph3"></span>
+	</div>
+</p>
+<div>
+	<div></div>
+</div>
+*/
+
 ```
 
 Example
