@@ -164,7 +164,11 @@ class HtmlCreator
 			/* Последний элемент массива */
 			}elseif($i == ($count-1)){
 				if(!is_array($val)){
-					$string .= ' '.$key.'="'.$val.'"';
+					if(!is_int($key)){
+						$string .= ' '.$key.'="'.$val.'"';
+					}else{
+						$string .= ' '.$val;
+					};
 				}else{
 					$iterateArray[] = self::simpleArray($val);
 				};
@@ -179,7 +183,11 @@ class HtmlCreator
 			/* Все остальные элементы массива */
 			}else{
 				if(!is_array($val)){
-					$string .= ' '.$key.'="'.$val.'"';
+					if(!is_int($key)){
+						$string .= ' '.$key.'="'.$val.'"';
+					}else{
+						$string .= ' '.$val;
+					};
 				}else{
 					$iterateArray[] = self::simpleArray($val);
 				};
