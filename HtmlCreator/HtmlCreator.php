@@ -4,7 +4,7 @@ namespace sergey144010;
 Вложенные теги
 
 ############
-Пример №1:
+# Пример №1:
 ############
 
 $array = [
@@ -35,7 +35,7 @@ Html::create($array);
 </div>
 
 ############
-Пример №2 - Простая Html страница:
+# Пример №2 - Простая Html страница:
 ############
 
 $array = [
@@ -98,8 +98,24 @@ Html::create($array);
 </html>
 
 ############
-Схема:
+# Пример №3:
 ############
+
+# Запись
+$array = [['p']];
+# аналогична записи 
+$array = ['p'];
+# т.е. 
+$array = ['p'=>'Text', 'class'=>'p_class', ['span'=>'Text span', 'class'=>'span_class', ['div']], ['b'=>'Text']];
+# тоже работает 
+
+############
+# Схема:
+############
+
+[tag1, option1=>value1, option2=>value2, ... , [] ,... ]
+
+or
 
 [
 	[tag1, option1=>value1, option2=>value2 ... ,
@@ -121,22 +137,17 @@ class HtmlCreator
 	static private $string;
 	
 	public static function create(array $array){
-		self::checkType($array);
 		self::main($array);
 		self::printHtml($array);
-		
 	}
 	public static function printHtml(){
 		echo self::$string;
 	}
-	private static function checkType($array){
-		foreach($array as $key=>$value){
-			if(!is_array($value)){
-				throw new Exception ('Incoming schema is not correct');
-			};
-		};
-	}
 	private static function main($array){
+		if(is_string(current($array))){
+			self::$string .= self::simpleArray($array);
+			return;
+		};
 		foreach($array as $subArray){
 			self::$string .= self::simpleArray($subArray);
 		};
