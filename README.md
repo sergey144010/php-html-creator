@@ -151,8 +151,24 @@ $array = [
 </html>
 
 ############
+# Пример №3:
+############
+
+# Запись
+$array = [['p']];
+# аналогична записи 
+$array = ['p'];
+# т.е. 
+$array = ['p'=>'Text', 'class'=>'p_class', ['span'=>'Text span', 'class'=>'span_class', ['div']], ['b'=>'Text']];
+# тоже работает 
+
+############
 # Схема:
 ############
+
+[tag1, option1=>value1, option2=>value2, ... , [] ,... ]
+
+or
 
 [
 	[tag1, option1=>value1, option2=>value2 ... ,
