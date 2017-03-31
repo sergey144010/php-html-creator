@@ -1,5 +1,5 @@
 <?php
-namespace sergey144010;
+namespace sergey144010\HtmlCreator;
 /*
 Вложенные теги
 
@@ -134,25 +134,38 @@ or
 
 class HtmlCreator
 {
-	static private $string;
+	private $string;
 
-	public static function create(array $array){
-		self::main($array);
-        self::printHtml($array);
+    public static function instance()
+    {
+        return new self;
+    }
+
+	public function create(array $array){
+		$this->main($array);
+        return $this;
 	}
-	public static function printHtml(){
-		echo self::$string;
+
+    public function getHtml()
+    {
+        return $this->string;
+    }
+
+	public function printHtml(){
+		echo $this->string;
 	}
-	private static function main($array){
+
+	private function main($array){
 		if(is_string(current($array))){
-			self::$string .= self::simpleArray($array);
+			$this->string .= $this->simpleArray($array);
 			return;
 		};
 		foreach($array as $subArray){
-			self::$string .= self::simpleArray($subArray);
+            $this->string .= $this->simpleArray($subArray);
 		};
 	}
-	private static function simpleArray(array $array){
+
+	private function simpleArray(array $array){
 		$count=count($array);
 		$i=0;
 		$string=false; $tag=false;
@@ -181,7 +194,7 @@ class HtmlCreator
 						$string .= ' '.$val;
 					};
 				}else{
-					$iterateArray[] = self::simpleArray($val);
+					$iterateArray[] = $this->simpleArray($val);
 				};
 				if($iterateArray){
 					foreach($iterateArray as $partIterateArray){
@@ -200,7 +213,7 @@ class HtmlCreator
 						$string .= ' '.$val;
 					};
 				}else{
-					$iterateArray[] = self::simpleArray($val);
+					$iterateArray[] = $this->simpleArray($val);
 				};
 			};
 			$i++;
