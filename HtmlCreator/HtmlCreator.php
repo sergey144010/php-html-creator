@@ -135,10 +135,10 @@ or
 class HtmlCreator
 {
 	static private $string;
-	
+
 	public static function create(array $array){
 		self::main($array);
-		self::printHtml($array);
+        self::printHtml($array);
 	}
 	public static function printHtml(){
 		echo self::$string;
