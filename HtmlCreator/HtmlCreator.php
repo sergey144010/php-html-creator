@@ -4,37 +4,6 @@ namespace sergey144010\HtmlCreator;
 Вложенные теги
 
 ############
-# Пример №1:
-############
-
-$array = [
-	['p'=>'Text many many text', 'class'=>'text', 'id'=>'paragraph1',
-		['div', 'class'=>'text2', 'id'=>'paragraph2',
-			['span', 'class'=>'text3', 'id'=>'paragraph3'
-			]
-		]
-	]
-	,
-	['div',['div']]
-];
-
-use sergey144010\HtmlCreator as Html;
-
-Html::create($array);
-
-Вернёт следующую строку:
-
-<p class="text" id="paragraph1">
-	Text many many text
-	<div class="text2" id="paragraph2">
-		<span class="text3" id="paragraph3"></span>
-	</div>
-</p>
-<div>
-	<div></div>
-</div>
-
-############
 # Пример №2 - Простая Html страница:
 ############
 
@@ -97,52 +66,43 @@ Html::create($array);
 	</body>
 </html>
 
-############
-# Пример №3:
-############
-
-# Запись
-$array = [['p']];
-# аналогична записи 
-$array = ['p'];
-# т.е. 
-$array = ['p'=>'Text', 'class'=>'p_class', ['span'=>'Text span', 'class'=>'span_class', ['div']], ['b'=>'Text']];
-# тоже работает 
-
-############
-# Схема:
-############
-
-[tag1, option1=>value1, option2=>value2, ... , [] ,... ]
-
-or
-
-[
-	[tag1, option1=>value1, option2=>value2 ... ,
-		[tag2, option21=>value21, option22=>value22 ... ,
-			[tag3, option31=>value31, option32=>value32 ... ,
-				...
-			],
-			...
-		],
-		...
-	],
-	...
-]
-
 */
+
+
 
 class HtmlCreator
 {
 	private $string;
+    private $strings;
 
     public static function instance()
     {
         return new self;
     }
 
-	public function create(array $array){
-		$this->main($array);
+    /*
+     * [$tag, $body, $attributes, $options];
+     *
+     * or
+     *
+     * [
+     *     [$tag, $body, $attributes, $options],
+     *     [$tag, $body, $attributes, $options],
+     *     [$tag, $body, $attributes, $options],
+     * ]
+     *
+     * @param array $tags
+     */
+	public function create(array $tags){
+        if(is_string($tags[0])){
+            $this->createTag($tags);
+            return $this;
+        };
+        foreach ($tags as $tag) {
+            $this->createTag($tag);
+            $this->strings .= $this->string;
+        };
+        $this->string = $this->strings;
         return $this;
 	}
 
@@ -155,69 +115,70 @@ class HtmlCreator
 		echo $this->string;
 	}
 
-	private function main($array){
-		if(is_string(current($array))){
-			$this->string .= $this->simpleArray($array);
-			return;
-		};
-		foreach($array as $subArray){
-            $this->string .= $this->simpleArray($subArray);
-		};
-	}
+    /*
+     * [$tag, $body, $attributes, $options];
+     *
+     * ['p', 'Text paragraf', ['class'=>'text', 'attr'=>'123'], ['beforeBody'=>'beforeText', 'afterBody'=>'afterText']]
+     * ['p', ['a', 'Link', ['class'=>'Link']]]
+     *
+     * @param string $tag
+     * @param string|array $body
+     * @param array $attributes
+     * @param array $options
+     */
+    private function createTag(array $tagOptions)
+    {
+        if(!isset($tagOptions[0])){
+            $tag = null;
+        }else{
+            $tag = $tagOptions[0];
+        };
+        if(!isset($tagOptions[1])){
+            $body = null;
+        }else{
+            $body = $this->prepareBody($tagOptions[1]);
+        };
+        if(!isset($tagOptions[2])){
+            $attributes = null;
+        }else{
+            $attributes = $this->prepareAttributes($tagOptions[2]);
+        };
+        if(!isset($tagOptions[3])){
+            $beforeBody = null;
+            $afterBody = null;
+        }else{
+            $beforeBody = null;
+            $afterBody = null;
+            if(isset($tagOptions[3]['beforeBody'])){
+                $beforeBody = $tagOptions[3]['beforeBody'];
+            };
+            if(isset($tagOptions[3]['afterBody'])){
+                $afterBody = $tagOptions[3]['afterBody'];
+            };
+        };
+        $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody.'</'.$tag.'>';
+        $this->string = $template;
+    }
 
-	private function simpleArray(array $array){
-		$count=count($array);
-		$i=0;
-		$string=false; $tag=false;
-		$iterateArray=false; $stringIterateArray=false;
-		foreach($array as $key=>$val){
-			/* Первый элемент массива */
-			if($i==0){
-				if(is_int($key)){
-					$tag = $val;
-					$tagVal = false;
-					$string .= '<'.$val;
-				}else{
-					$tag = $key;
-					$tagVal = $val;
-					$string .= '<'.$key;
-				};
-				if($i==0 && $count==1){
-					$string .= '>'.$tagVal.'</'.$tag.'>';
-				};
-			/* Последний элемент массива */
-			}elseif($i == ($count-1)){
-				if(!is_array($val)){
-					if(!is_int($key)){
-						$string .= ' '.$key.'="'.$val.'"';
-					}else{
-						$string .= ' '.$val;
-					};
-				}else{
-					$iterateArray[] = $this->simpleArray($val);
-				};
-				if($iterateArray){
-					foreach($iterateArray as $partIterateArray){
-						$stringIterateArray .= $partIterateArray;
-					};
-				}else{
-					$stringIterateArray = false;
-				};
-				$string .= '>'.$tagVal.$stringIterateArray.'</'.$tag.'>';
-			/* Все остальные элементы массива */
-			}else{
-				if(!is_array($val)){
-					if(!is_int($key)){
-						$string .= ' '.$key.'="'.$val.'"';
-					}else{
-						$string .= ' '.$val;
-					};
-				}else{
-					$iterateArray[] = $this->simpleArray($val);
-				};
-			};
-			$i++;
-		};
-		return $string;
-	}
+    private function prepareBody($body)
+    {
+        $string = null;
+        if(is_string($body)){
+            $string = $body;
+        };
+        if(is_array($body)){
+            $this->createTag($body);
+            $string = $this->string;
+        };
+        return $string;
+    }
+
+    private function prepareAttributes(array $attributes)
+    {
+        $string = null;
+        foreach ($attributes as $attribute => $value) {
+            $string .= ' '.$attribute.'="'.$value.'"';
+        }
+        return $string;
+    }
 }
