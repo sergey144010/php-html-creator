@@ -1,79 +1,15 @@
 <?php
+
 namespace sergey144010\HtmlCreator;
-/*
-Вложенные теги
-
-############
-# Пример №2 - Простая Html страница:
-############
-
-$array = [
-	['html', 'xmlns'=>'http://www.w3.org/1999/xhtml', 'lang'=>'ru',
-		['head',
-			['title'=>'Simple Html Page']
-		],
-		['body',
-			['h1'=>'Simple Html Page'],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorRed'],
-				['span'=>'Example text', 'class'=>'fontColorGreen'],
-			],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorBlue'],
-				['span'=>'Example text', 'class'=>'fontColorWhite'],
-			],
-			['h2'=>'Simple Example'],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorBlue'],
-				['span'=>'Example text', 'class'=>'fontColorWhite'],
-			],
-			['footer',
-				['div', 'class'=>'container footer-content']
-			],
-		]
-	]
-];
-
-
-use sergey144010\HtmlCreator as Html;
-
-Html::create($array);
-
-Вернёт следующую строку:
-
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
-	<head>
-		<title>Simple Html Page</title>
-	</head>
-	<body>
-		<h1>Simple Html Page</h1>
-		<p>
-			<span class="fontColorRed">Simple text</span>
-			<span class="fontColorGreen">Example text</span>
-		</p>
-		<p>
-			<span class="fontColorBlue">Simple text</span>
-			<span class="fontColorWhite">Example text</span>
-		</p>
-		<h2>Simple Example</h2>
-		<p>
-			<span class="fontColorBlue">Simple text</span>
-			<span class="fontColorWhite">Example text</span>
-		</p>
-		<footer>
-			<div class="container footer-content"></div>
-		</footer>
-	</body>
-</html>
-
-*/
-
 
 
 class HtmlCreator
 {
+    const NOT_CLOSE = 'not_close';
+
 	private $string;
     private $strings;
+    private $stringsBody;
 
     public static function instance()
     {
@@ -120,6 +56,7 @@ class HtmlCreator
      *
      * ['p', 'Text paragraf', ['class'=>'text', 'attr'=>'123'], ['beforeBody'=>'beforeText', 'afterBody'=>'afterText']]
      * ['p', ['a', 'Link', ['class'=>'Link']]]
+     * ['p', [['a'],['b']], ...]
      *
      * @param string $tag
      * @param string|array $body
@@ -146,17 +83,27 @@ class HtmlCreator
         if(!isset($tagOptions[3])){
             $beforeBody = null;
             $afterBody = null;
+            $closingTag = null;
         }else{
             $beforeBody = null;
             $afterBody = null;
+            $closingTag = null;
             if(isset($tagOptions[3]['beforeBody'])){
                 $beforeBody = $tagOptions[3]['beforeBody'];
             };
             if(isset($tagOptions[3]['afterBody'])){
                 $afterBody = $tagOptions[3]['afterBody'];
             };
+            if(isset($tagOptions[3]['closingTag'])){
+                $closingTag = $tagOptions[3]['closingTag'];
+            };
         };
-        $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody.'</'.$tag.'>';
+        if(isset($closingTag) && $closingTag == self::NOT_CLOSE){
+            $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody;
+        }else{
+            $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody.'</'.$tag.'>';
+        };
+
         $this->string = $template;
     }
 
@@ -167,6 +114,16 @@ class HtmlCreator
             $string = $body;
         };
         if(is_array($body)){
+            if(is_array($body[0])){
+                /*
+                foreach ($body as $tag) {
+                    $this->createTag($tag);
+                    $this->stringsBody .= $this->string;
+                };
+                */
+                return self::instance()->create($body)->getHtml();
+                #return $this->stringsBody;
+            };
             $this->createTag($body);
             $string = $this->string;
         };
