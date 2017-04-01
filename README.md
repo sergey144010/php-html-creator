@@ -6,7 +6,7 @@ Install
 
 Add repositories and require in composer.json file
 
- ```php
+```php
 {
     "repositories": [
         {
@@ -18,7 +18,8 @@ Add repositories and require in composer.json file
         "sergey144010/php-html-creator": "@dev"
     }
 }
- ```
+```
+
 and make
 
 composer.phar update
@@ -29,7 +30,7 @@ Usage
 ```php
 require('vendor/autoload.php');
 
-use sergey144010\HtmlCreator as Html;
+use sergey144010\HtmlCreator\Html;
 
 $array = [
 	['p'=>'Text many many text', 'class'=>'text', 'id'=>'paragraph1',
@@ -183,4 +184,29 @@ or
 	...
 ]
 
+```
+
+Html class have 2 method and is a wrapper for HtmlCreator class
+
+```php
+use sergey144010\HtmlCreator\Html;
+
+# Print
+Html::create(['p']);
+
+# Get string
+var_dump(Html::getString(['p']));
+
+```
+
+Usage HtmlCreator class
+
+```php
+use sergey144010\HtmlCreator\HtmlCreator;
+
+# Print
+HtmlCreator::instance()->create(['p'])->printHtml();
+
+# Get string
+var_dump(HtmlCreator::instance()->create(['p'])->getHtml());
 ```
