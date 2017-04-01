@@ -33,15 +33,54 @@ class Html
     public static function getEmptyPage()
     {
         $body = [
-            ['html',
-                ['head',
-                    ['meta', 'charset'=>'utf-8'],
-                    ['title'],
+            'html',
+            [
+                [
+                    'head',
+                    [
+                        ['meta', null, ['charset'=>'utf-8']],
+                        ['title']
+                    ]
                 ],
-                ['body']
-            ]
+                ['body'],
+            ],
+            ['lang'=>'en']
         ];
         return HtmlCreator::instance()->create($body)->getHtml();
+    }
+
+    public static function simplePage()
+    {
+        echo self::getSimplePage();
+    }
+
+    public static function getSimplePage()
+    {
+        $body = [
+            'html',
+            [
+                [
+                    'head',
+                    [
+                        ['meta', null, ['charset'=>'utf-8']],
+                        ['title', 'Simple Page']
+                    ]
+                ],
+                [
+                    'body',
+                    [
+                        ['h1', 'Simple Page'],
+                        ['h2', 'Simple Page'],
+                        ['h3', 'Simple Page']
+                    ]
+                ],
+                ['footer']
+            ],
+            ['lang'=>'ru']
+        ];
+        $html = HtmlCreator::instance()->create($body)->getHtml();
+        $html = '<!DOCTYPE html>'.$html;
+        return $html;
     }
 
     public static function createPage(array $options)
