@@ -1,210 +1,163 @@
 <?php
-namespace sergey144010;
-/*
-Вложенные теги
 
-############
-# Пример №1:
-############
+namespace sergey144010\HtmlCreator;
 
-$array = [
-	['p'=>'Text many many text', 'class'=>'text', 'id'=>'paragraph1',
-		['div', 'class'=>'text2', 'id'=>'paragraph2',
-			['span', 'class'=>'text3', 'id'=>'paragraph3'
-			]
-		]
-	]
-	,
-	['div',['div']]
-];
-
-use sergey144010\HtmlCreator as Html;
-
-Html::create($array);
-
-Вернёт следующую строку:
-
-<p class="text" id="paragraph1">
-	Text many many text
-	<div class="text2" id="paragraph2">
-		<span class="text3" id="paragraph3"></span>
-	</div>
-</p>
-<div>
-	<div></div>
-</div>
-
-############
-# Пример №2 - Простая Html страница:
-############
-
-$array = [
-	['html', 'xmlns'=>'http://www.w3.org/1999/xhtml', 'lang'=>'ru',
-		['head',
-			['title'=>'Simple Html Page']
-		],
-		['body',
-			['h1'=>'Simple Html Page'],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorRed'],
-				['span'=>'Example text', 'class'=>'fontColorGreen'],
-			],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorBlue'],
-				['span'=>'Example text', 'class'=>'fontColorWhite'],
-			],
-			['h2'=>'Simple Example'],
-			['p',
-				['span'=>'Simple text', 'class'=>'fontColorBlue'],
-				['span'=>'Example text', 'class'=>'fontColorWhite'],
-			],
-			['footer',
-				['div', 'class'=>'container footer-content']
-			],
-		]
-	]
-];
-
-
-use sergey144010\HtmlCreator as Html;
-
-Html::create($array);
-
-Вернёт следующую строку:
-
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
-	<head>
-		<title>Simple Html Page</title>
-	</head>
-	<body>
-		<h1>Simple Html Page</h1>
-		<p>
-			<span class="fontColorRed">Simple text</span>
-			<span class="fontColorGreen">Example text</span>
-		</p>
-		<p>
-			<span class="fontColorBlue">Simple text</span>
-			<span class="fontColorWhite">Example text</span>
-		</p>
-		<h2>Simple Example</h2>
-		<p>
-			<span class="fontColorBlue">Simple text</span>
-			<span class="fontColorWhite">Example text</span>
-		</p>
-		<footer>
-			<div class="container footer-content"></div>
-		</footer>
-	</body>
-</html>
-
-############
-# Пример №3:
-############
-
-# Запись
-$array = [['p']];
-# аналогична записи 
-$array = ['p'];
-# т.е. 
-$array = ['p'=>'Text', 'class'=>'p_class', ['span'=>'Text span', 'class'=>'span_class', ['div']], ['b'=>'Text']];
-# тоже работает 
-
-############
-# Схема:
-############
-
-[tag1, option1=>value1, option2=>value2, ... , [] ,... ]
-
-or
-
-[
-	[tag1, option1=>value1, option2=>value2 ... ,
-		[tag2, option21=>value21, option22=>value22 ... ,
-			[tag3, option31=>value31, option32=>value32 ... ,
-				...
-			],
-			...
-		],
-		...
-	],
-	...
-]
-
-*/
 
 class HtmlCreator
 {
-	static private $string;
+    const NOT_CLOSE = 'not_close';
+    const ONLY_ATTRIBUTE = 'onlyAttribute';
 
-	public static function create(array $array){
-		self::main($array);
-        self::printHtml($array);
+	private $string;
+    private $strings;
+    private $stringsBody;
+
+    private $beforeBody;
+    private $afterBody;
+    private $closingTag;
+
+    public static function instance()
+    {
+        return new self;
+    }
+
+    /*
+     * [$tag, $body, $attributes, $options];
+     *
+     * or
+     *
+     * [
+     *     [$tag, $body, $attributes, $options],
+     *     [$tag, $body, $attributes, $options],
+     *     [$tag, $body, $attributes, $options],
+     * ]
+     *
+     * @param array $tags
+     */
+	public function create(array $tags){
+        if(is_string($tags[0])){
+            $this->createTag($tags);
+            return $this;
+        };
+        foreach ($tags as $tag) {
+            $this->createTag($tag);
+            $this->strings .= $this->string;
+        };
+        $this->string = $this->strings;
+        return $this;
 	}
-	public static function printHtml(){
-		echo self::$string;
+
+    public function getHtml()
+    {
+        return $this->string;
+    }
+
+	public function printHtml(){
+		echo $this->string;
 	}
-	private static function main($array){
-		if(is_string(current($array))){
-			self::$string .= self::simpleArray($array);
-			return;
-		};
-		foreach($array as $subArray){
-			self::$string .= self::simpleArray($subArray);
-		};
-	}
-	private static function simpleArray(array $array){
-		$count=count($array);
-		$i=0;
-		$string=false; $tag=false;
-		$iterateArray=false; $stringIterateArray=false;
-		foreach($array as $key=>$val){
-			/* Первый элемент массива */
-			if($i==0){
-				if(is_int($key)){
-					$tag = $val;
-					$tagVal = false;
-					$string .= '<'.$val;
-				}else{
-					$tag = $key;
-					$tagVal = $val;
-					$string .= '<'.$key;
-				};
-				if($i==0 && $count==1){
-					$string .= '>'.$tagVal.'</'.$tag.'>';
-				};
-			/* Последний элемент массива */
-			}elseif($i == ($count-1)){
-				if(!is_array($val)){
-					if(!is_int($key)){
-						$string .= ' '.$key.'="'.$val.'"';
-					}else{
-						$string .= ' '.$val;
-					};
-				}else{
-					$iterateArray[] = self::simpleArray($val);
-				};
-				if($iterateArray){
-					foreach($iterateArray as $partIterateArray){
-						$stringIterateArray .= $partIterateArray;
-					};
-				}else{
-					$stringIterateArray = false;
-				};
-				$string .= '>'.$tagVal.$stringIterateArray.'</'.$tag.'>';
-			/* Все остальные элементы массива */
-			}else{
-				if(!is_array($val)){
-					if(!is_int($key)){
-						$string .= ' '.$key.'="'.$val.'"';
-					}else{
-						$string .= ' '.$val;
-					};
-				}else{
-					$iterateArray[] = self::simpleArray($val);
-				};
-			};
-			$i++;
-		};
-		return $string;
-	}
+
+    /*
+     * [$tag, $body, $attributes, $options];
+     *
+     * ['p', 'Text paragraf', ['class'=>'text', 'attr'=>'123'], ['beforeBody'=>'beforeText', 'afterBody'=>'afterText']]
+     * ['p', ['a', 'Link', ['class'=>'Link']]]
+     * ['p', [['a'],['b']], ...]
+     *
+     * @param string $tag
+     * @param string|array $body
+     * @param array $attributes
+     * @param array $options
+     */
+    private function createTag(array $tagOptions)
+    {
+        if(!isset($tagOptions[3])){
+            $tagOptions[3] = null;
+        };
+        $this->prepareOptions($tagOptions[3]);
+
+        if(!isset($tagOptions[0])){
+            $tag = null;
+        }else{
+            $tag = $tagOptions[0];
+        };
+        if(!isset($tagOptions[1])){
+            $body = null;
+        }else{
+            $body = $this->prepareBody($tagOptions[1]);
+        };
+        if(!isset($tagOptions[2])){
+            $attributes = null;
+        }else{
+            $attributes = $this->prepareAttributes($tagOptions[2]);
+        };
+
+        if(isset($this->closingTag) && $this->closingTag == self::NOT_CLOSE){
+            $template = '<'.$tag.$attributes.'>'.$this->beforeBody.$body.$this->afterBody;
+        }else{
+            $template = '<'.$tag.$attributes.'>'.$this->beforeBody.$body.$this->afterBody.'</'.$tag.'>';
+        };
+
+        $this->string = $template;
+    }
+
+    private function prepareBody($body)
+    {
+        $string = null;
+        if(is_string($body)){
+            $string = $body;
+        };
+        if(is_array($body)){
+            if(is_array($body[0])){
+                /*
+                foreach ($body as $tag) {
+                    $this->createTag($tag);
+                    $this->stringsBody .= $this->string;
+                };
+                */
+                return self::instance()->create($body)->getHtml();
+                #return $this->stringsBody;
+            };
+            $this->createTag($body);
+            $string = $this->string;
+        };
+        return $string;
+    }
+
+    private function prepareAttributes(array $attributes)
+    {
+        $string = null;
+        foreach ($attributes as $attribute => $value) {
+            if($value == self::ONLY_ATTRIBUTE){
+                $string .= ' '.$attribute;
+            }else{
+                $string .= ' '.$attribute.'="'.$value.'"';
+            };
+        }
+        return $string;
+    }
+
+    /*
+     * @param array $options
+     */
+    private function prepareOptions($options = null)
+    {
+        if(!isset($options)){
+            $this->beforeBody = null;
+            $this->afterBody = null;
+            $this->closingTag = null;
+        }else{
+            $this->beforeBody = null;
+            $this->afterBody = null;
+            $this->closingTag = null;
+            if(isset($options['beforeBody'])){
+                $this->beforeBody = $options['beforeBody'];
+            };
+            if(isset($options['afterBody'])){
+                $this->afterBody = $options['afterBody'];
+            };
+            if(isset($options['closingTag'])){
+                $this->closingTag = $options['closingTag'];
+            };
+        };
+    }
 }
