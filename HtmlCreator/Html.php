@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Мария
+ * User: Sergey
  * Date: 01.04.2017
  * Time: 6:17
  */
@@ -70,8 +70,37 @@ class Html
                     'body',
                     [
                         ['h1', 'Simple Page'],
-                        ['h2', 'Simple Page'],
-                        ['h3', 'Simple Page']
+                        ['h2', 'Example Input'],
+                        [
+                            'form',
+                            [
+                                ['strong', 'Select type'],
+                                ['br', null, null, ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['input', 'IE', ['type'=>'radio', 'name'=>'browser', 'value'=>'ie'], ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['br', null, null, ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['input', 'Firefox', ['type'=>'radio', 'name'=>'browser', 'value'=>'firefox'], ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['br', null, null, ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['input', 'Opera', ['type'=>'radio', 'name'=>'browser', 'value'=>'opera'], ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['br', null, null, ['closingTag'=>HtmlCreator::NOT_CLOSE]],
+                                ['input', null, ['type'=>'submit', 'value'=>'Send']],
+                                ['input', null, ['type'=>'reset', 'value'=>'Reset']],
+
+                            ],
+                            ['name'=>'formName1', 'method'=>'post', 'action'=>'action.php']
+                        ],
+                        ['h2', 'Example Select'],
+                        [
+                            'form',
+                            ['select',
+                                [
+                                    ['option', 'SelectType', ['disabled'=>HtmlCreator::ONLY_ATTRIBUTE]],
+                                    ['option', 'IE', ['value'=>'ie']],
+                                    ['option', 'Firefox', ['value'=>'ie', 'selected'=>HtmlCreator::ONLY_ATTRIBUTE]],
+                                    ['option', 'Opera', ['value'=>'opera']],
+                                ]
+                            ],
+                            ['name'=>'formName2', 'method'=>'post', 'action'=>'action.php']
+                        ],
                     ]
                 ],
                 ['footer']
@@ -90,6 +119,7 @@ class Html
 
     public static function getPage(array $options)
     {
+        /*
         if(!isset($options['title'])){$options['title'] = null;};
         if(!isset($options['bodyText'])){$options['bodyText'] = null;};
         if(!isset($options['body'])){$options['body'] = null;};
@@ -111,5 +141,6 @@ class Html
         ];
 
         return HtmlCreator::instance()->create($body)->getHtml();
+        */
     }
 }

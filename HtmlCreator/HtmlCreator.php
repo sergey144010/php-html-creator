@@ -6,10 +6,15 @@ namespace sergey144010\HtmlCreator;
 class HtmlCreator
 {
     const NOT_CLOSE = 'not_close';
+    const ONLY_ATTRIBUTE = 'onlyAttribute';
 
 	private $string;
     private $strings;
     private $stringsBody;
+
+    private $beforeBody;
+    private $afterBody;
+    private $closingTag;
 
     public static function instance()
     {
@@ -65,6 +70,11 @@ class HtmlCreator
      */
     private function createTag(array $tagOptions)
     {
+        if(!isset($tagOptions[3])){
+            $tagOptions[3] = null;
+        };
+        $this->prepareOptions($tagOptions[3]);
+
         if(!isset($tagOptions[0])){
             $tag = null;
         }else{
@@ -80,28 +90,11 @@ class HtmlCreator
         }else{
             $attributes = $this->prepareAttributes($tagOptions[2]);
         };
-        if(!isset($tagOptions[3])){
-            $beforeBody = null;
-            $afterBody = null;
-            $closingTag = null;
+
+        if(isset($this->closingTag) && $this->closingTag == self::NOT_CLOSE){
+            $template = '<'.$tag.$attributes.'>'.$this->beforeBody.$body.$this->afterBody;
         }else{
-            $beforeBody = null;
-            $afterBody = null;
-            $closingTag = null;
-            if(isset($tagOptions[3]['beforeBody'])){
-                $beforeBody = $tagOptions[3]['beforeBody'];
-            };
-            if(isset($tagOptions[3]['afterBody'])){
-                $afterBody = $tagOptions[3]['afterBody'];
-            };
-            if(isset($tagOptions[3]['closingTag'])){
-                $closingTag = $tagOptions[3]['closingTag'];
-            };
-        };
-        if(isset($closingTag) && $closingTag == self::NOT_CLOSE){
-            $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody;
-        }else{
-            $template = '<'.$tag.$attributes.'>'.$beforeBody.$body.$afterBody.'</'.$tag.'>';
+            $template = '<'.$tag.$attributes.'>'.$this->beforeBody.$body.$this->afterBody.'</'.$tag.'>';
         };
 
         $this->string = $template;
@@ -134,8 +127,37 @@ class HtmlCreator
     {
         $string = null;
         foreach ($attributes as $attribute => $value) {
-            $string .= ' '.$attribute.'="'.$value.'"';
+            if($value == self::ONLY_ATTRIBUTE){
+                $string .= ' '.$attribute;
+            }else{
+                $string .= ' '.$attribute.'="'.$value.'"';
+            };
         }
         return $string;
+    }
+
+    /*
+     * @param array $options
+     */
+    private function prepareOptions($options = null)
+    {
+        if(!isset($options)){
+            $this->beforeBody = null;
+            $this->afterBody = null;
+            $this->closingTag = null;
+        }else{
+            $this->beforeBody = null;
+            $this->afterBody = null;
+            $this->closingTag = null;
+            if(isset($options['beforeBody'])){
+                $this->beforeBody = $options['beforeBody'];
+            };
+            if(isset($options['afterBody'])){
+                $this->afterBody = $options['afterBody'];
+            };
+            if(isset($options['closingTag'])){
+                $this->closingTag = $options['closingTag'];
+            };
+        };
     }
 }
